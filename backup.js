@@ -1,5 +1,10 @@
 function exportBackup() {
   const data = {
+    meta: {
+      version: 1,
+      createdAt: Date.now()
+    },
+    usuario: getData("usuario"),
     ventas: getData("ventas"),
     gastos: getData("gastos"),
     productos: getData("productos")
@@ -7,11 +12,17 @@ function exportBackup() {
 
   const filename = `respaldo_${fileStamp()}.json`;
 
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const blob = new Blob(
+    [JSON.stringify(data, null, 2)],
+    { type: "application/json" }
+  );
+
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
   a.download = filename;
   a.click();
+
+  URL.revokeObjectURL(a.href);
 }
 
 function importBackup(e) {
@@ -19,12 +30,38 @@ function importBackup(e) {
   if (!file) return;
 
   const r = new FileReader();
+
   r.onload = () => {
-    const d = JSON.parse(r.result);
-    if (d.ventas) saveData("ventas", d.ventas);
-    if (d.gastos) saveData("gastos", d.gastos);
-    if (d.productos) saveData("productos", d.productos);
-    location.reload();
+    try {
+      const d = JSON.parse(r.result);
+
+      if (!d.usuario || !Array.isArray(d.ventas) || !Array.isArray(d.gastos)) {
+        throw new Error("Estructura de respaldo inválida");
+      }
+
+      saveData("usuario", d.usuario);
+      saveData("ventas", d.ventas);
+      saveData("gastos", d.gastos);
+      saveData("productos", d.productos || []);
+
+      // ✅ marcar archivo como activo
+      sessionStorage.setItem("activeFile", "true");
+
+      // ✅ iniciar sesión
+      //startSessionTimer();
+
+      // ✅ renderizar UI
+      renderBusinessHeader();
+      renderResumen();
+
+      // ✅ dejar que el watcher decida
+      enforceAppState();
+
+    } catch (err) {
+      alert("❌ Archivo de respaldo inválido");
+      console.error(err);
+    }
   };
+
   r.readAsText(file);
 }

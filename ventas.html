@@ -7,6 +7,8 @@
 </head>
 <body>
 
+  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión"> Guardar y cerrar sesión 💾🔒 </button>
+
   <h1>VENTAS</h1>
 
   <form id="ventaForm">
@@ -50,9 +52,14 @@
   </div>
 
   <script src="data.js"></script>
+  <script src="backup.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
   <script src="ventas.js"></script>
+  <script src="navigation.js"></script>
+  <script src="session.js"></script>
+  <script src="quickLogout.js"></script>
+  <script src="logoutModal.js"></script>
 
   <!-- MODAL DETALLE VENTA -->
   <div id="modalDetalle" class="modal hidden">
@@ -64,6 +71,24 @@
       </div>
     </div>
   </div>
+
+  <!-- =========================
+     MODAL CERRAR SESIÓN
+     ========================= -->
+<div id="modalLogout" class="modal hidden">
+  <div class="modal-card">
+    <h2>🔒 Cerrar sesión</h2>
+    <p>
+      Se creará automáticamente un archivo de respaldo<br>
+      y se finalizará la sesión actual.
+    </p>
+
+    <div class="modal-actions">
+      <button id="btnConfirmLogout">Guardar y cerrar</button>
+      <button id="btnCancelLogout">Cancelar</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>

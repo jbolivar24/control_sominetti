@@ -2,17 +2,46 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Resumen</title>
+  <title>Control Panadería</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
+<!-- =========================
+     PANTALLA DE BIENVENIDA
+     ========================= -->
+<div id="screen-welcome" class="screen active">
+
+  <div class="card">
+    <h1>Bienvenido</h1>
+    <p class="muted">Para comenzar, seleccione una opción</p>
+
+    <div class="botones">
+      <button id="btnNuevoUsuario">🆕 Nuevo usuario</button>
+      <button id="btnCargarDatos">📂 Cargar datos</button>
+    </div>
+
+    <input
+      type="file"
+      id="fileInputWelcome"
+      accept=".json,application/json"
+      style="display:none"
+    >
+  </div>
+
+</div>
+
+<!-- =========================
+     PANTALLA DE LA APP
+     ========================= -->
+<div id="screen-app" class="screen">
+
   <div class="card">
 
     <div class="business-header">
-      <div class="business-name">JUAN DOMINGO SIMONETTI<br>QUEZADA</div>
-      <div class="business-giro">COMPRA Y VENTA DE PROD DE PANADERIA Y PA</div>
-      <div class="business-address">GAMERO 1803 1815 EX 2303 JA RIOS · INDEPENDENCIA · STGO</div>
+      <div class="business-name" id="bhName"></div>
+      <div class="business-giro" id="bhGiro"></div>
+      <div class="business-address" id="bhAddress"></div>
     </div>
 
     <h1>RESUMEN DEL NEGOCIO</h1>
@@ -20,33 +49,86 @@
     <div id="resumen"></div>
 
     <div class="botones">
-      <button onclick="exportBackup()">📥 Guardar respaldo</button>
-
-      <input
-        type="file"
-        id="fileInput"
-        accept=".json,application/json"
-        style="display:none"
-        onchange="importBackup(event)"
-      >
-      <button onclick="document.getElementById('fileInput').click()">
-        📤 Cargar respaldo
-      </button>
+      <button id="btnLogout" class="danger">🔒 Guardar y cerrar sesión</button>
     </div>
 
     <div class="nav">
-      <a href="ventas.html">Ir a Ventas</a>
-      |
-      <a href="gastos.html">Ir a Gastos</a>
-      |
+      <a href="ventas.html">Ir a Ventas</a> |
+      <a href="gastos.html">Ir a Gastos</a> |
       <a href="productos.html">Productos</a>
     </div>
 
   </div>
 
-  <script src="data.js"></script>
-  <script src="resumen.js"></script>
-  <script src="backup.js"></script>
+</div>
+
+<!-- =========================
+     MODAL NUEVO USUARIO
+     ========================= -->
+<div id="modalNuevoUsuario" class="modal hidden">
+  <div class="modal-card">
+    <h2>Nuevo usuario</h2>
+
+    <form id="nuevoUsuarioForm">
+      <input type="text" id="razonSocial" placeholder="Razón social" required>
+      <input type="text" id="rut" placeholder="RUT" required>
+      <input type="text" id="direccion" placeholder="Dirección fiscal" required>
+      <input type="text" id="giro" placeholder="Giro" required>
+
+      <div class="modal-actions">
+        <button type="submit">Crear usuario</button>
+        <button type="button" id="btnCancelar">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- =========================
+     MODAL SESIÓN POR VENCER
+     ========================= -->
+<div id="modalSession" class="modal hidden">
+  <div class="modal-card">
+    <h2>⚠️ Sesión por finalizar</h2>
+    <p>
+      Tu sesión está a punto de finalizar.<br>
+      ¿Deseas extenderla?
+    </p>
+
+    <div class="modal-actions">
+      <button id="btnExtendSession">Extender sesión</button>
+      <button id="btnEndSession">Finalizar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     MODAL CERRAR SESIÓN
+     ========================= -->
+<div id="modalLogout" class="modal hidden">
+  <div class="modal-card">
+    <h2>🔒 Cerrar sesión</h2>
+    <p>
+      Se creará automáticamente un archivo de respaldo<br>
+      y se finalizará la sesión actual.
+    </p>
+
+    <div class="modal-actions">
+      <button id="btnConfirmLogout">Guardar y cerrar</button>
+      <button id="btnCancelLogout">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     SCRIPTS
+     ========================= -->
+<script src="data.js"></script>
+<script src="backup.js"></script>
+<script src="navigation.js"></script>
+<script src="appState.js"></script>
+<script src="session.js"></script>
+<script src="resumen.js"></script>
+<script src="logoutModal.js"></script>
 
 </body>
 </html>
