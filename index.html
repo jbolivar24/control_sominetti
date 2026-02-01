@@ -1,134 +1,126 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Gestión Comercial</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Registro de Gastos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<!-- =========================
-     PANTALLA DE BIENVENIDA
-     ========================= -->
-<div id="screen-welcome" class="screen active">
+  <main class="container">
+    <h1>💸 Registro de Gastos</h1>
 
-  <div class="card">
-    <h1>Bienvenido</h1>
-    <p class="muted">Para comenzar, seleccione una opción</p>
+    <button id="btnAdd" class="primary">Registrar gasto</button>
+    <button id="changePin">🔐 Cambiar PIN</button>
 
-    <div class="botones">
-      <button id="btnNuevoUsuario">🆕 Nuevo usuario</button>
-      <button id="btnCargarDatos">📂 Cargar datos</button>
+    <div class="filter-box">
+      <label>Mes</label>
+      <input type="month" id="monthFilter">
+      <button id="clearFilter">Todos</button>
     </div>
 
-    <input
-      type="file"
-      id="fileInputWelcome"
-      accept=".json,application/json"
-      style="display:none"
-    >
+    <div id="printMonth" class="print-only"></div>
+
+    <!-- TOTAL GLOBAL -->
+    <div class="total-box">
+      Total gastado:
+      <span id="totalGlobal">$0</span>
+    </div>
+
+    <div class="export-box">
+      <button id="exportCsv">📤 Exportar CSV</button>
+      <button id="exportPdf">📄 Exportar PDF</button>
+    </div>
+
+    <!-- TABLA -->
+    <table>
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Rubro</th>
+          <th>Monto</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="gastosBody"></tbody>
+    </table>
+
+    <!-- RESUMEN -->
+    <h2>Resumen por rubro</h2>
+    <ul id="resumen"></ul>
+  </main>
+
+  <h2>Distribución por rubro</h2>
+  <div class="chart-box">
+    <canvas id="chartRubro"></canvas>
   </div>
 
-</div>
+  <h2>Comparación de meses</h2>
 
-<!-- =========================
-     PANTALLA DE LA APP
-     ========================= -->
-<div id="screen-app" class="screen">
-
-  <div class="card">
-
-    <div class="business-header">
-      <div class="business-name" id="bhName"></div>
-      <div class="business-giro" id="bhGiro"></div>
-      <div class="business-address" id="bhAddress"></div>
-    </div>
-
-    <h1>RESUMEN DEL NEGOCIO</h1>
-
-    <div id="resumen"></div>
-
-    <div class="botones">
-      <button id="btnLogout" class="danger">🔒 Guardar y cerrar sesión</button>
-    </div>
-
-    <div class="nav">
-      <a href="ventas.html">Ir a Ventas</a> |
-      <a href="gastos.html">Ir a Gastos</a> |
-      <a href="productos.html">Productos</a>
-    </div>
-
+  <div class="compare-box">
+    <input type="month" id="compareMonthA">
+    <input type="month" id="compareMonthB">
+    <button id="compareBtn">Comparar</button>
   </div>
 
-</div>
+  <div id="compareResult"></div>
 
-<!-- =========================
-     MODAL NUEVO USUARIO
-     ========================= -->
-<div id="modalNuevoUsuario" class="modal hidden">
-  <div class="modal-card">
-    <h2>Nuevo usuario</h2>
+  <!-- MODAL -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <h3>Registrar gasto</h3>
 
-    <form id="nuevoUsuarioForm">
-      <input type="text" id="razonSocial" placeholder="Razón social" required>
-      <input type="text" id="rut" placeholder="RUT" required>
-      <input type="text" id="direccion" placeholder="Dirección fiscal" required>
-      <input type="text" id="giro" placeholder="Giro" required>
+      <label>Fecha</label>
+      <input type="date" id="date">
 
-      <div class="modal-actions">
-        <button type="submit">Crear usuario</button>
-        <button type="button" id="btnCancelar">Cancelar</button>
+      <label>Rubro</label>
+      <select id="category">
+        <option>AGUA</option>
+        <option>DIVIDENDO</option>
+        <option>CELULARES</option>
+        <option>CREDITO MERCADOLIBRE</option>
+        <option>CREDITO SANTANDER</option>
+        <option>ELECTRICIDAD</option>
+        <option>GAS</option>
+        <option>GASTOS COMUNES</option>
+        <option>INTERNET</option>
+        <option>TARJETA DE CREDITO</option>
+        <option>OTROS GASTOS</option>
+      </select>
+
+      <label>Monto</label>
+      <input type="number" id="amount" placeholder="Ej: 250265">
+
+      <label>Nota (opcional)</label>
+      <input type="text" id="note">
+
+      <div class="actions">
+        <button id="cancel">Cancelar</button>
+        <button id="save" class="primary">Guardar</button>
       </div>
-    </form>
-  </div>
-</div>
-
-<!-- =========================
-     MODAL SESIÓN POR VENCER
-     ========================= -->
-<div id="modalSession" class="modal hidden">
-  <div class="modal-card">
-    <h2>⚠️ Sesión por finalizar</h2>
-    <p>
-      Tu sesión está a punto de finalizar.<br>
-      ¿Deseas extenderla?
-    </p>
-
-    <div class="modal-actions">
-      <button id="btnExtendSession">Extender sesión</button>
-      <button id="btnEndSession">Finalizar</button>
     </div>
   </div>
-</div>
 
-<!-- =========================
-     MODAL CERRAR SESIÓN
-     ========================= -->
-<div id="modalLogout" class="modal hidden">
-  <div class="modal-card">
-    <h2>🔒 Cerrar sesión</h2>
-    <p>
-      Se creará automáticamente un archivo de respaldo<br>
-      y se finalizará la sesión actual.
-    </p>
+  <div id="pinModal" class="modal hidden">
+    <div class="modal-content">
+      <h3 id="pinTitle">Acceso personal</h3>
 
-    <div class="modal-actions">
-      <button id="btnConfirmLogout">Guardar y cerrar</button>
-      <button id="btnCancelLogout">Cancelar</button>
+      <input
+        type="password"
+        id="pinInput"
+        maxlength="4"
+        inputmode="numeric"
+        placeholder="PIN de 4 dígitos"
+      >
+
+      <button id="pinConfirm" class="primary">Confirmar</button>
     </div>
   </div>
-</div>
 
-<!-- =========================
-     SCRIPTS
-     ========================= -->
-<script src="data.js"></script>
-<script src="backup.js"></script>
-<script src="navigation.js"></script>
-<script src="appState.js"></script>
-<script src="session.js"></script>
-<script src="resumen.js"></script>
-<script src="logoutModal.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="pin.js"></script>
+  <script src="app.js"></script>
 
 </body>
 </html>
