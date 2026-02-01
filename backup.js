@@ -1,16 +1,22 @@
 function exportBackup() {
+  const usuario = getData("usuario") || {};
+
+  // 📌 RUT limpio para nombre de archivo (sin puntos ni guión)
+  const rutRaw = usuario.rut || "SIN_RUT";
+  const rutFile = rutRaw.replace(/[^0-9kK]/g, "");
+
   const data = {
     meta: {
       version: 1,
       createdAt: Date.now()
     },
-    usuario: getData("usuario"),
+    usuario,
     ventas: getData("ventas"),
     gastos: getData("gastos"),
     productos: getData("productos")
   };
 
-  const filename = `respaldo_${fileStamp()}.json`;
+  const filename = `datos_${rutFile}_${fileStamp()}.json`;
 
   const blob = new Blob(
     [JSON.stringify(data, null, 2)],
