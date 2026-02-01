@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Productos</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión"> Guardar y cerrar sesión 💾🔒 </button>
+
+  <h1>PRODUCTOS</h1>
+
+  <form id="productoForm">
+    <input type="text" id="nombre" placeholder="Nombre del producto" required>
+    <input type="number" id="precio" placeholder="Precio venta" required>
+    <button>Guardar Producto</button>
+  </form>
+
+  <table id="tablaProductos"></table>
+
+  <div class="export-actions">
+    <button type="button" class="btn-secondary" onclick="exportProductosCSV()">⬇️ Exportar CSV</button>
+    <button type="button" class="btn-secondary" onclick="exportProductosPDF()">🖨️ Exportar PDF</button>
+  </div>
+
+  <div class="footer-actions">
+    <a href="index.html" class="btn-volver">← Volver al resumen</a>
+  </div>
+
+  <!-- =========================
+     MODAL CERRAR SESIÓN
+     ========================= -->
+<div id="modalLogout" class="modal hidden">
+  <div class="modal-card">
+    <h2>🔒 Cerrar sesión</h2>
+    <p>
+      Se creará automáticamente un archivo de respaldo<br>
+      y se finalizará la sesión actual.
+    </p>
+
+    <div class="modal-actions">
+      <button id="btnConfirmLogout">Guardar y cerrar</button>
+      <button id="btnCancelLogout">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+  <script src="data.js"></script>
+  <script src="backup.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  <script src="productos.js"></script>
+  <script src="navigation.js"></script>
+  <script src="session.js"></script>
+  <script src="quickLogout.js"></script>
+  <script src="logoutModal.js"></script>
+
+</body>
+</html>
