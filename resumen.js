@@ -30,7 +30,7 @@ function renderResumen() {
   const gastos = getData("gastos") || [];
 
   const totalVentas = ventas.reduce((a, b) => a + (b.t || 0), 0);
-  const totalGastos = gastos.reduce((a, b) => a + (b.t || 0), 0);
+  const totalGastos = gastos.reduce((a, b) => a + (b.m || 0), 0);
   const resultado   = totalVentas - totalGastos;
 
   const cont = document.getElementById("resumen");
