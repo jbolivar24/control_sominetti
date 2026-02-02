@@ -117,7 +117,7 @@ function editar(i) {
 
 // ================= EXPORT CSV =================
 function exportGastosCSV() {
-  const gastos = getData("gastos");
+  const gastos = gastosFiltrados || getData("gastos");
   if (!gastos.length) return alert("No hay gastos para exportar.");
 
   const header = ["Fecha", "Tipo", "Monto"];
@@ -128,15 +128,23 @@ function exportGastosCSV() {
   ]);
 
   const csv = [header, ...rows]
-    .map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(","))
+    .map(r =>
+      r.map(x =>
+        `"${String(x).replace(/"/g, '""')}"`
+      ).join(";")
+    )
     .join("\n");
 
-  downloadText(`gastos_${fileStamp()}.csv`, csv, "text/csv;charset=utf-8");
+  downloadText(
+    `gastos_${fileStamp()}.csv`,
+    csv,
+    "text/csv;charset=utf-8"
+  );
 }
 
 // ================= EXPORT PDF =================
 function exportGastosPDF() {
-  const gastos = getData("gastos");
+  const gastos = gastosFiltrados || getData("gastos");
   if (!gastos.length) return alert("No hay gastos para exportar.");
 
   if (!usuario.razonSocial) {
