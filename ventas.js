@@ -321,7 +321,7 @@ function exportVentasCSV() {
     v.neto || 0,
     v.iva || 0,
     v.t || 0,
-    (v.items || []).map(it => `${it.nombre} (${it.cantidad})`).join(", ")
+    (v.items || []).map(it => `${it.nombre} (${it.cantidad})`).join("; ")
   ]);
 
   const csv = [header, ...rows]
