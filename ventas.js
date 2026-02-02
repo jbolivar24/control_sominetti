@@ -143,6 +143,8 @@ function renderVentas() {
   const allVentas = getData("ventas");
   const ventas = ventasFiltradas || allVentas;
 
+  const isFiltered = !!ventasFiltradas;
+
   tablaVentas.innerHTML = `
     <tr>
       <th>Fecha</th>
@@ -165,9 +167,15 @@ function renderVentas() {
         <td class="monto right" data-valor="${v.iva}">$0</td>
         <td class="monto right" data-valor="${v.t}">$0</td>
         <td>
-          <button class="btn-editar" onclick="editar(${i})">✏️</button>
-          <button class="btn-eliminar" onclick="eliminar(${i})">🗑️</button>
-          <button class="btn-editar" onclick="verDetalle(${i})">👁️</button>
+          ${
+            isFiltered
+              ? `<button class="btn-editar" onclick="verDetalle(${i})">👁️</button>`
+              : `
+                <button class="btn-editar" onclick="editar(${i})">✏️</button>
+                <button class="btn-eliminar" onclick="eliminar(${i})">🗑️</button>
+                <button class="btn-editar" onclick="verDetalle(${i})">👁️</button>
+              `
+          }
         </td>
       </tr>
     `;
@@ -180,11 +188,15 @@ function renderVentas() {
 
 // ================= FILTRO =================
 btnFiltrarVentas.onclick = () => {
+
+  // 👉 sin fechas: quitar filtro y mostrar todo
   if (!ventaDesde.value || !ventaHasta.value) {
-    alert("Seleccione ambas fechas");
+    ventasFiltradas = null;
+    renderVentas();
     return;
   }
 
+  // 👉 con fechas: aplicar filtro
   ventasFiltradas = filterByDateRange(
     getData("ventas"),
     ventaDesde.value,

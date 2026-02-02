@@ -23,6 +23,8 @@ function render() {
   const allGastos = getData("gastos");
   const gastos = gastosFiltrados || allGastos;
 
+  const isFiltered = !!gastosFiltrados; // true si hay filtro activo
+
   t.innerHTML = `
     <tr>
       <th>Fecha</th>
@@ -41,8 +43,14 @@ function render() {
         <td>${g.ti}</td>
         <td class="monto right" data-valor="${monto}">$0</td>
         <td>
-          <button class="btn-editar" onclick="editar(${i})">✏️</button>
-          <button class="btn-eliminar" onclick="eliminar(${i})">🗑️</button>
+          ${
+            isFiltered
+              ? `<span class="muted">—</span>`
+              : `
+                <button class="btn-editar" onclick="editar(${i})">✏️</button>
+                <button class="btn-eliminar" onclick="eliminar(${i})">🗑️</button>
+              `
+          }
         </td>
       </tr>
     `;
@@ -55,11 +63,15 @@ function render() {
 
 // ================= FILTRO =================
 btnFiltrarGastos.onclick = () => {
+
+  // 👉 si NO hay fechas, quitamos filtro y mostramos todo
   if (!gastoDesde.value || !gastoHasta.value) {
-    alert("Seleccione ambas fechas");
+    gastosFiltrados = null;
+    render();
     return;
   }
 
+  // 👉 si hay ambas fechas, aplicamos filtro
   gastosFiltrados = filterByDateRange(
     getData("gastos"),
     gastoDesde.value,
@@ -99,9 +111,20 @@ f.onsubmit = (e) => {
 // ================= ACCIONES =================
 function eliminar(i) {
   if (!confirm("¿Eliminar este gasto?")) return;
+
   const gastos = getData("gastos");
   gastos.splice(i, 1);
   saveData("gastos", gastos);
+
+  // 🔄 re-aplicar filtro si estaba activo
+  if (gastosFiltrados) {
+    gastosFiltrados = filterByDateRange(
+      gastos,
+      gastoDesde.value,
+      gastoHasta.value
+    );
+  }
+
   render();
 }
 
