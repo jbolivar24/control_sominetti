@@ -327,7 +327,7 @@ function exportVentasCSV() {
   const csv = [header, ...rows]
     .map(r => r.map(x =>
       `"${String(x).replace(/"/g, '""')}"`
-    ).join(","))
+    ).join(";"))
     .join("\n");
 
   downloadText(
