@@ -248,7 +248,7 @@ function cerrarModal() {
 
 // ================= PDF =================
 function exportVentasPDF() {
-  const ventas = getData("ventas");
+  const ventas = ventasFiltradas || getData("ventas");
   if (!ventas.length) return alert("No hay ventas para exportar.");
 
   if (!usuario.razonSocial) {
@@ -298,6 +298,43 @@ function exportVentasPDF() {
   doc.text(`Generado: ${new Date().toLocaleString("es-CL")}`, 40, doc.lastAutoTable.finalY + 20);
 
   doc.save(`ventas_${fileStamp()}.pdf`);
+}
+
+function exportVentasCSV() {
+  const ventas = ventasFiltradas || getData("ventas");
+  if (!ventas.length) return alert("No hay ventas para exportar.");
+
+  const header = [
+    "Fecha",
+    "Factura",
+    "Cliente",
+    "Neto",
+    "IVA",
+    "Total",
+    "Detalle"
+  ];
+
+  const rows = ventas.map(v => [
+    v.f || "",
+    v.fa || "",
+    v.c || "",
+    v.neto || 0,
+    v.iva || 0,
+    v.t || 0,
+    (v.items || []).map(it => `${it.nombre} (${it.cantidad})`).join(", ")
+  ]);
+
+  const csv = [header, ...rows]
+    .map(r => r.map(x =>
+      `"${String(x).replace(/"/g, '""')}"`
+    ).join(","))
+    .join("\n");
+
+  downloadText(
+    `ventas_${fileStamp()}.csv`,
+    csv,
+    "text/csv;charset=utf-8"
+  );
 }
 
 renderVentas();
