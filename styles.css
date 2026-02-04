@@ -327,7 +327,7 @@ form button { width: 100%; margin-top: 10px; }
   z-index: 999;
 
   padding: 10px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: none;
 
   background: #2f80ed;
@@ -408,7 +408,7 @@ form button { width: 100%; margin-top: 10px; }
 }
 
 .producto-resumen {
-  border: 1px solid rgba(255,255,255,0.15);
+  border: 1px solid rgba(255, 255, 255, 0.678);
   border-radius: 10px;
   padding: 12px;
   background: #d7dde4;
@@ -421,7 +421,7 @@ form button { width: 100%; margin-top: 10px; }
   align-items: flex-start;
   padding: 14px 18px;
   border-radius: 10px;
-  background: #9d9fa1;
+  background: #e7e8eb;
 }
 
 .producto-header strong {
@@ -439,7 +439,7 @@ form button { width: 100%; margin-top: 10px; }
 .detalle-col h4 {
   margin: 0 0 8px;
   padding-bottom: 4px;
-  border-bottom: 1px solid rgba(255,255,255,0.15);
+  border-bottom: 1px solid #e7e8eb;
   font-size: 0.85rem;
   opacity: 0.9;
 }
