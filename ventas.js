@@ -1,6 +1,6 @@
 // ================= DATOS BASE =================
 const productos = getData("productos") || [];
-const usuario   = getData("usuario") || [];
+const usuario   = getData("usuario") || {};
 
 // ================= ELEMENTOS =================
 const form = document.getElementById("ventaForm");
@@ -27,43 +27,63 @@ const btnFiltrarVentas = document.getElementById("btnFiltrarVentas");
 let ventasFiltradas = null;
 let items = [];
 let editIndex = null;
+let ventaOriginal = null;
 
 setDynamicTitle("Ventas");
 
-// ================= PRODUCTOS =================
+// ================= HELPERS =================
+function revertirVendidos(items = []) {
+  const productos = getData("productos") || [];
+
+  items.forEach(it => {
+    const p = productos.find(x => x.codigo === it.codigo);
+    if (p) {
+      p.vendidos = (p.vendidos || 0) - it.cantidad;
+      if (p.vendidos < 0) p.vendidos = 0;
+    }
+  });
+
+  saveData("productos", productos);
+}
+
+// ================= CARGA PRODUCTOS =================
 productos.forEach(p => {
   const opt = document.createElement("option");
-  opt.value = p.id;
-  opt.textContent = `${p.nombre} (${formatCLP(p.precio)})`;
+  opt.value = p.codigo;
+  opt.textContent = `${p.codigo} - ${p.nombre}`;
   productoSel.appendChild(opt);
 });
 
 productoSel.onchange = () => {
-  const p = productos.find(x => x.id == productoSel.value);
-  if (p) precioInput.value = p.precio;
+  const p = productos.find(x => x.codigo === productoSel.value);
+  if (p) precioInput.value = p.precioVenta;
 };
 
 // ================= ITEMS =================
 document.getElementById("btnAgregarItem").onclick = () => {
-  const p = productos.find(x => x.id == productoSel.value);
+  const p = productos.find(x => x.codigo === productoSel.value);
   const cantidad = Number(cantidadInput.value);
   const precio = Number(precioInput.value);
 
   if (!p || cantidad <= 0 || precio <= 0) return;
 
-  items.push({ nombre: p.nombre, cantidad, precio });
+  items.push({
+    codigo: p.codigo,
+    nombre: p.nombre,
+    cantidad,
+    precio
+  });
 
   cantidadInput.value = "";
   precioInput.value = "";
-
   renderItems();
 };
 
 function renderItems() {
   tablaItems.innerHTML = `
     <tr>
-      <th>Item</th>
-      <th>Cantidad</th>
+      <th>Producto</th>
+      <th>Cant.</th>
       <th>Precio</th>
       <th>Subtotal</th>
       <th></th>
@@ -78,7 +98,7 @@ function renderItems() {
 
     tablaItems.innerHTML += `
       <tr>
-        <td>${it.nombre}</td>
+        <td>${it.codigo} - ${it.nombre}</td>
         <td>${it.cantidad}</td>
         <td class="right">${formatCLP(it.precio)}</td>
         <td class="right">${formatCLP(sub)}</td>
@@ -126,11 +146,15 @@ form.onsubmit = (e) => {
   if (editIndex !== null) {
     ventas[editIndex] = venta;
     editIndex = null;
+    ventaOriginal = null;
   } else {
     ventas.push(venta);
   }
 
   saveData("ventas", ventas);
+
+  // 🔥 recalcular TODO después de guardar
+  recalcularProductos();
 
   form.reset();
   items = [];
@@ -140,10 +164,8 @@ form.onsubmit = (e) => {
 
 // ================= TABLA VENTAS =================
 function renderVentas() {
-  const allVentas = getData("ventas");
+  const allVentas = getData("ventas") || [];
   const ventas = ventasFiltradas || allVentas;
-
-  const isFiltered = !!ventasFiltradas;
 
   tablaVentas.innerHTML = `
     <tr>
@@ -157,7 +179,14 @@ function renderVentas() {
     </tr>
   `;
 
-  ventas.forEach((v, i) => {
+  ventas.forEach(v => {
+    const realIndex = allVentas.findIndex(x =>
+      x.f === v.f &&
+      x.fa === v.fa &&
+      x.c === v.c &&
+      x.t === v.t
+    );
+
     tablaVentas.innerHTML += `
       <tr>
         <td>${v.f}</td>
@@ -167,15 +196,9 @@ function renderVentas() {
         <td class="monto right" data-valor="${v.iva}">$0</td>
         <td class="monto right" data-valor="${v.t}">$0</td>
         <td>
-          ${
-            isFiltered
-              ? `<button class="btn-editar" onclick="verDetalle(${i})">👁️</button>`
-              : `
-                <button class="btn-editar" onclick="editar(${i})">✏️</button>
-                <button class="btn-eliminar" onclick="eliminar(${i})">🗑️</button>
-                <button class="btn-editar" onclick="verDetalle(${i})">👁️</button>
-              `
-          }
+          <button class="btn-editar" onclick="editar(${realIndex})">✏️</button>
+          <button class="btn-eliminar" onclick="eliminar(${realIndex})">🗑️</button>
+          <button class="btn-editar" onclick="verDetalle(${realIndex})">👁️</button>
         </td>
       </tr>
     `;
@@ -186,17 +209,45 @@ function renderVentas() {
   });
 }
 
+// ================= EDITAR / ELIMINAR =================
+function editar(i) {
+  const v = getData("ventas")[i];
+
+  // respaldo solo informativo (por si quieres cancelar)
+  ventaOriginal = JSON.parse(JSON.stringify(v));
+
+  fecha.value   = v.f;
+  factura.value = v.fa;
+  cliente.value = v.c;
+
+  // clonar items correctamente
+  items = v.items.map(it => ({ ...it }));
+
+  editIndex = i;
+  renderItems();
+}
+
+function eliminar(i) {
+  if (!confirm("¿Eliminar esta venta?")) return;
+
+  const ventas = getData("ventas");
+  ventas.splice(i, 1);
+  saveData("ventas", ventas);
+
+  // 🔥 recalcular TODO el inventario
+  recalcularProductos();
+
+  renderVentas();
+}
+
 // ================= FILTRO =================
 btnFiltrarVentas.onclick = () => {
-
-  // 👉 sin fechas: quitar filtro y mostrar todo
   if (!ventaDesde.value || !ventaHasta.value) {
     ventasFiltradas = null;
     renderVentas();
     return;
   }
 
-  // 👉 con fechas: aplicar filtro
   ventasFiltradas = filterByDateRange(
     getData("ventas"),
     ventaDesde.value,
@@ -206,27 +257,7 @@ btnFiltrarVentas.onclick = () => {
   renderVentas();
 };
 
-// ================= ACCIONES =================
-function eliminar(i) {
-  if (!confirm("¿Eliminar esta venta?")) return;
-  const ventas = getData("ventas");
-  ventas.splice(i, 1);
-  saveData("ventas", ventas);
-  renderVentas();
-}
-
-function editar(i) {
-  const v = getData("ventas")[i];
-
-  fecha.value = v.f;
-  factura.value = v.fa;
-  cliente.value = v.c;
-  items = [...(v.items || [])];
-
-  editIndex = i;
-  renderItems();
-}
-
+// ================= DETALLE =================
 function verDetalle(i) {
   const v = getData("ventas")[i];
   const body = document.getElementById("modalBody");
@@ -236,17 +267,33 @@ function verDetalle(i) {
   (v.items || []).forEach(it => {
     html += `
       <div class="modal-body-item">
-        <span>${it.nombre} (${it.cantidad})</span>
-        <span>${formatCLP(it.cantidad * it.precio)}</span>
+        <div>
+          <strong>${it.codigo ?? "-"}</strong> - ${it.nombre}<br>
+          <small>
+            ${it.cantidad} × ${formatCLP(it.precio)}
+          </small>
+        </div>
+        <div class="right">
+          ${formatCLP(it.cantidad * it.precio)}
+        </div>
       </div>
     `;
   });
 
   html += `
     <div class="modal-total">
-      <div class="modal-body-item"><span>Neto</span><span>${formatCLP(v.neto)}</span></div>
-      <div class="modal-body-item"><span>IVA 19%</span><span>${formatCLP(v.iva)}</span></div>
-      <div class="modal-body-item"><span>Total</span><span>${formatCLP(v.t)}</span></div>
+      <div class="modal-body-item">
+        <span>Neto</span>
+        <span>${formatCLP(v.neto)}</span>
+      </div>
+      <div class="modal-body-item">
+        <span>IVA 19%</span>
+        <span>${formatCLP(v.iva)}</span>
+      </div>
+      <div class="modal-body-item total">
+        <strong>Total</strong>
+        <strong>${formatCLP(v.t)}</strong>
+      </div>
     </div>
   `;
 
@@ -258,7 +305,30 @@ function cerrarModal() {
   document.getElementById("modalDetalle").classList.add("hidden");
 }
 
-// ================= PDF =================
+// ================= EXPORT =================
+function exportVentasCSV() {
+  const ventas = ventasFiltradas || getData("ventas");
+  if (!ventas.length) return alert("No hay ventas para exportar.");
+
+  const header = ["Fecha","Factura","Cliente","Neto","IVA","Total","Detalle"];
+
+  const rows = ventas.map(v => [
+    v.f || "",
+    v.fa || "",
+    v.c || "",
+    v.neto || 0,
+    v.iva || 0,
+    v.t || 0,
+    (v.items || []).map(it => `${it.codigo} (${it.cantidad})`).join("; ")
+  ]);
+
+  const csv = [header, ...rows]
+    .map(r => r.map(x => `"${String(x).replace(/"/g, '""')}"`).join(";"))
+    .join("\n");
+
+  downloadText(`ventas_${fileStamp()}.csv`, csv, "text/csv;charset=utf-8");
+}
+
 function exportVentasPDF() {
   const ventas = ventasFiltradas || getData("ventas");
   if (!ventas.length) return alert("No hay ventas para exportar.");
@@ -271,82 +341,66 @@ function exportVentasPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF("l", "pt", "a4");
 
-  // ===== HEADER DINÁMICO =====
   doc.setFontSize(14);
   doc.text(usuario.razonSocial, 40, 40);
-
-  doc.setFontSize(10);
-  doc.text(usuario.giro || "", 40, 58);
-  doc.text(usuario.direccion || "", 40, 72);
-
   doc.setFontSize(12);
-  doc.text("Reporte de Ventas", 40, 100);
+  doc.text("Reporte de Ventas", 40, 80);
 
-  // ===== TABLA =====
   const body = ventas.map(v => [
     v.f,
     v.fa,
     v.c,
     formatCLP(v.neto),
     formatCLP(v.iva),
-    formatCLP(v.t),
-    (v.items || []).map(it => `${it.nombre} (${it.cantidad})`).join(", ")
+    formatCLP(v.t)
   ]);
 
   doc.autoTable({
-    startY: 120,
-    head: [["Fecha","Factura","Cliente","Neto","IVA","Total","Detalle"]],
+    startY: 110,
+    head: [["Fecha","Factura","Cliente","Neto","IVA","Total"]],
     body,
-    styles: { fontSize: 8 },
-    headStyles: { fillColor: [220, 220, 220] },
-    columnStyles: {
-      3: { halign: "right" },
-      4: { halign: "right" },
-      5: { halign: "right" }
-    }
+    styles: { fontSize: 9 }
   });
-
-  doc.setFontSize(9);
-  doc.text(`Generado: ${new Date().toLocaleString("es-CL")}`, 40, doc.lastAutoTable.finalY + 20);
 
   doc.save(`ventas_${fileStamp()}.pdf`);
 }
 
-function exportVentasCSV() {
-  const ventas = ventasFiltradas || getData("ventas");
-  if (!ventas.length) return alert("No hay ventas para exportar.");
+function recalcularProductos() {
+  const productos = getData("productos") || [];
+  const compras   = getData("compras") || [];
+  const ventas    = getData("ventas") || [];
 
-  const header = [
-    "Fecha",
-    "Factura",
-    "Cliente",
-    "Neto",
-    "IVA",
-    "Total",
-    "Detalle"
-  ];
+  // 🔄 resetear contadores
+  productos.forEach(p => {
+    p.comprados = 0;
+    p.vendidos  = 0;
+  });
 
-  const rows = ventas.map(v => [
-    v.f || "",
-    v.fa || "",
-    v.c || "",
-    v.neto || 0,
-    v.iva || 0,
-    v.t || 0,
-    (v.items || []).map(it => `${it.nombre} (${it.cantidad})`).join("; ")
-  ]);
+  // 🔼 sumar compras
+  compras.forEach(c => {
+    (c.items || []).forEach(it => {
+      const p = productos.find(x => x.codigo === it.codigo);
+      if (p) {
+        p.comprados += it.cantidad;
+        p.precioCompra = it.precio;       // última compra manda
+        p.ultimaCompra = c.f;
+      }
+    });
+  });
 
-  const csv = [header, ...rows]
-    .map(r => r.map(x =>
-      `"${String(x).replace(/"/g, '""')}"`
-    ).join(";"))
-    .join("\n");
+  // 🔽 sumar ventas
+  ventas.forEach(v => {
+    (v.items || []).forEach(it => {
+      const p = productos.find(x => x.codigo === it.codigo);
+      if (p) {
+        p.vendidos += it.cantidad;
+      }
+    });
+  });
 
-  downloadText(
-    `ventas_${fileStamp()}.csv`,
-    csv,
-    "text/csv;charset=utf-8"
-  );
+  saveData("productos", productos);
 }
+
+// quickLogout.js
 
 renderVentas();

@@ -7,13 +7,33 @@
 </head>
 <body>
 
-  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión"> Guardar y cerrar sesión 💾🔒 </button>
+  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión">
+    Guardar y cerrar sesión 💾🔒
+  </button>
 
   <h1>PRODUCTOS</h1>
 
   <form id="productoForm">
+
+    <input type="text" id="codigo" placeholder="Código del producto" required>
     <input type="text" id="nombre" placeholder="Nombre del producto" required>
-    <input type="number" id="precio" placeholder="Precio venta" required>
+    <input type="number" id="precioVenta" placeholder="Precio venta" required>
+    <!--
+    <input
+      type="number"
+      id="precioCompra"
+      placeholder="Precio compra (se define en compras)"
+      value="0"
+      disabled
+    >
+     Stock solo informativo 
+    <input
+      type="number"
+      id="stock"
+      placeholder="Stock (calculado)"
+      disabled
+    >
+    -->
     <button>Guardar Producto</button>
   </form>
 
@@ -29,22 +49,22 @@
   </div>
 
   <!-- =========================
-     MODAL CERRAR SESIÓN
-     ========================= -->
-<div id="modalLogout" class="modal hidden">
-  <div class="modal-card">
-    <h2>🔒 Cerrar sesión</h2>
-    <p>
-      Se creará automáticamente un archivo de respaldo<br>
-      y se finalizará la sesión actual.
-    </p>
+       MODAL CERRAR SESIÓN
+       ========================= -->
+  <div id="modalLogout" class="modal hidden">
+    <div class="modal-card">
+      <h2>🔒 Cerrar sesión</h2>
+      <p>
+        Se creará automáticamente un archivo de respaldo<br>
+        y se finalizará la sesión actual.
+      </p>
 
-    <div class="modal-actions">
-      <button id="btnConfirmLogout">Guardar y cerrar</button>
-      <button id="btnCancelLogout">Cancelar</button>
+      <div class="modal-actions">
+        <button id="btnConfirmLogout">Guardar y cerrar</button>
+        <button id="btnCancelLogout">Cancelar</button>
+      </div>
     </div>
   </div>
-</div>
 
   <script src="data.js"></script>
   <script src="backup.js"></script>

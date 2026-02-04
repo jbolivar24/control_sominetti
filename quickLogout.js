@@ -1,5 +1,4 @@
 document.addEventListener("DOMContentLoaded", () => {
-
   const btn = document.getElementById("btnQuickLogout");
   const modal = document.getElementById("modalLogout");
 

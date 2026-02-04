@@ -101,3 +101,47 @@ function setDynamicTitle(suffix = "Administración") {
     document.title = `Home · ${suffix}`;
   }
 }
+
+/* =========================
+   INVENTARIO (GLOBAL)
+   ========================= */
+
+function recalcularProductos() {
+  const productos = getData("productos") || [];
+  const compras   = getData("compras")   || [];
+  const ventas    = getData("ventas")    || [];
+
+  // reset
+  productos.forEach(p => {
+    p.comprados = 0;
+    p.vendidos  = 0;
+  });
+
+  // sumar compras
+  compras.forEach(c => {
+    (c.items || []).forEach(it => {
+      const p = productos.find(x => x.codigo === it.codigo);
+      if (p) {
+        p.comprados += Number(it.cantidad) || 0;
+        if (it.precio != null) p.precioCompra = Number(it.precio) || 0;
+        p.ultimaCompra = c.f || p.ultimaCompra;
+      }
+    });
+  });
+
+  // sumar ventas
+  ventas.forEach(v => {
+    (v.items || []).forEach(it => {
+      const p = productos.find(x => x.codigo === it.codigo);
+      if (p) {
+        p.vendidos += Number(it.cantidad) || 0;
+      }
+    });
+  });
+
+  saveData("productos", productos);
+}
+
+// Exponer para todas las páginas
+window.recalcularProductos = recalcularProductos;
+

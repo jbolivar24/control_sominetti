@@ -7,7 +7,10 @@
 </head>
 <body>
 
-  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión"> Guardar y cerrar sesión 💾🔒 </button>
+  <a href="index.html" class="btn-volver">← Volver al resumen</a>
+  <button id="btnQuickLogout" class="quick-logout" title="Guardar y cerrar sesión">
+    Guardar y cerrar sesión 💾🔒
+  </button>
 
   <h1>VENTAS</h1>
 
@@ -41,16 +44,8 @@
   </form>
 
   <div class="date-range">
-    <label>
-      Desde
-      <input type="date" id="ventaDesde">
-    </label>
-
-    <label>
-      Hasta
-      <input type="date" id="ventaHasta">
-    </label>
-
+    <label>Desde <input type="date" id="ventaDesde"></label>
+    <label>Hasta <input type="date" id="ventaHasta"></label>
     <button type="button" id="btnFiltrarVentas">Consultar</button>
   </div>
 
@@ -61,8 +56,15 @@
     <button type="button" class="btn-secondary" onclick="exportVentasPDF()">🖨️ Exportar PDF</button>
   </div>
 
-  <div class="footer-actions">
-    <a href="index.html" class="btn-volver">← Volver al resumen</a>
+  <!-- MODAL DETALLE -->
+  <div id="modalDetalle" class="modal hidden">
+    <div class="modal-content">
+      <h3>Detalle de la venta</h3>
+      <div id="modalBody"></div>
+      <div class="modal-actions">
+        <button onclick="cerrarModal()">Cerrar</button>
+      </div>
+    </div>
   </div>
 
   <script src="data.js"></script>
@@ -75,34 +77,22 @@
   <script src="quickLogout.js"></script>
   <script src="logoutModal.js"></script>
 
-  <!-- MODAL DETALLE VENTA -->
-  <div id="modalDetalle" class="modal hidden">
-    <div class="modal-content">
-      <h3>Detalle de la venta</h3>
-      <div id="modalBody"></div>
-      <div class="modal-actions">
-        <button onclick="cerrarModal()">Cerrar</button>
-      </div>
-    </div>
-  </div>
-
   <!-- =========================
      MODAL CERRAR SESIÓN
      ========================= -->
-<div id="modalLogout" class="modal hidden">
-  <div class="modal-card">
-    <h2>🔒 Cerrar sesión</h2>
-    <p>
-      Se creará automáticamente un archivo de respaldo<br>
-      y se finalizará la sesión actual.
-    </p>
+  <div id="modalLogout" class="modal hidden">
+    <div class="modal-card">
+      <h2>🔒 Cerrar sesión</h2>
+      <p>
+        Se creará automáticamente un archivo de respaldo<br>
+        y se finalizará la sesión actual.
+      </p>
 
-    <div class="modal-actions">
-      <button id="btnConfirmLogout">Guardar y cerrar</button>
-      <button id="btnCancelLogout">Cancelar</button>
+      <div class="modal-actions">
+        <button id="btnConfirmLogout">Guardar y cerrar</button>
+        <button id="btnCancelLogout">Cancelar</button>
+      </div>
     </div>
   </div>
-</div>
-
 </body>
 </html>

@@ -3,20 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <title>Gestión Comercial</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <button id="btnQuickLogout" class="quick-logout">
+    Guardar y cerrar sesión 💾🔒
+  </button>
 
-<!-- =========================
+
+<!-- ==================================================
      PANTALLA DE BIENVENIDA
-     ========================= -->
+     ================================================== -->
 <div id="screen-welcome" class="screen active">
 
-  <div class="card">
+  <div class="card card-center">
     <h1>Bienvenido</h1>
     <p class="muted">Para comenzar, seleccione una opción</p>
 
-    <div class="botones">
+    <div class="botones vertical">
       <button id="btnNuevoUsuario">🆕 Nuevo usuario</button>
       <button id="btnCargarDatos">📂 Cargar datos</button>
     </div>
@@ -25,46 +31,90 @@
       type="file"
       id="fileInputWelcome"
       accept=".json,application/json"
-      style="display:none"
+      hidden
     >
   </div>
 
 </div>
 
-<!-- =========================
-     PANTALLA DE LA APP
-     ========================= -->
+<!-- ==================================================
+     PANTALLA PRINCIPAL DE LA APP
+     ================================================== -->
 <div id="screen-app" class="screen">
 
-  <div class="card">
+  <div class="card card-wide">
 
-    <div class="business-header">
+    <!-- =========================
+         ENCABEZADO DEL NEGOCIO
+         ========================= -->
+    <header class="business-header">
       <div class="business-name" id="bhName"></div>
       <div class="business-giro" id="bhGiro"></div>
       <div class="business-address" id="bhAddress"></div>
-    </div>
+    </header>
 
-    <h1>RESUMEN DEL NEGOCIO</h1>
+    <!-- =========================
+         ACCIONES PRINCIPALES
+         ========================= -->
 
-    <div id="resumen"></div>
+    <!-- =========================
+         NAVEGACIÓN
+         ========================= -->
+    <nav class="nav">
+      <a href="ventas.html">Ir a Ventas</a>
+      <span class="sep">|</span>
+      <a href="compras.html">Ir a Compras</a>
+      <span class="sep">|</span>
+      <a href="productos.html">Ir a Productos</a>
+    </nav>
 
-    <div class="botones">
-      <button id="btnLogout" class="danger">🔒 Guardar y cerrar sesión</button>
-    </div>
+    <!-- =========================
+         RESUMEN
+         ========================= -->
+    <section class="section">
+      <h1 class="section-title">Resumen del negocio</h1>
 
-    <div class="nav">
-      <a href="ventas.html">Ir a Ventas</a> |
-      <a href="gastos.html">Ir a Gastos</a> |
-      <a href="productos.html">Productos</a>
-    </div>
+      <!-- Resumen económico -->
+      <div id="resumen"></div>
+
+      <h1 class="section-title">Resumen de productos</h1>
+      <!-- Resumen por productos -->
+      <div id="resumenProductos" class="resumen-productos"></div>
+
+      <h1 class="section-title">Análisis de productos</h1>
+
+      <div class="graficos-grid">
+
+        <div class="grafico-card">
+          <h3>🧾 Vendidos por producto</h3>
+          <canvas id="graficoVendidos"></canvas>
+        </div>
+
+        <div class="grafico-separador"></div>
+
+        <div class="grafico-card">
+          <h3>📦 Comprados por producto</h3>
+          <canvas id="graficoComprados"></canvas>
+        </div>
+
+        <div class="grafico-separador"></div>
+
+        <div class="grafico-card">
+          <h3>📊 Stock actual</h3>
+          <canvas id="graficoStock"></canvas>
+        </div>
+
+      </div>
+
+    </section>
 
   </div>
 
 </div>
 
-<!-- =========================
+<!-- ==================================================
      MODAL NUEVO USUARIO
-     ========================= -->
+     ================================================== -->
 <div id="modalNuevoUsuario" class="modal hidden">
   <div class="modal-card">
     <h2>Nuevo usuario</h2>
@@ -83,9 +133,9 @@
   </div>
 </div>
 
-<!-- =========================
+<!-- ==================================================
      MODAL SESIÓN POR VENCER
-     ========================= -->
+     ================================================== -->
 <div id="modalSession" class="modal hidden">
   <div class="modal-card">
     <h2>⚠️ Sesión por finalizar</h2>
@@ -101,9 +151,9 @@
   </div>
 </div>
 
-<!-- =========================
+<!-- ==================================================
      MODAL CERRAR SESIÓN
-     ========================= -->
+     ================================================== -->
 <div id="modalLogout" class="modal hidden">
   <div class="modal-card">
     <h2>🔒 Cerrar sesión</h2>
@@ -119,16 +169,18 @@
   </div>
 </div>
 
-<!-- =========================
+<!-- ==================================================
      SCRIPTS
-     ========================= -->
+     ================================================== -->
 <script src="data.js"></script>
 <script src="backup.js"></script>
 <script src="navigation.js"></script>
 <script src="appState.js"></script>
 <script src="session.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="resumen.js"></script>
 <script src="logoutModal.js"></script>
+<script src="quickLogout.js"></script>
 
 </body>
 </html>

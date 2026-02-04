@@ -45,6 +45,9 @@ function forceEndSession() {
   sessionStorage.removeItem("sessionToken");
   sessionStorage.removeItem("activeFile");
 
+  // 🔒 ocultar quick logout inmediatamente
+  if (typeof updateQuickLogout === "function") updateQuickLogout();
+
   resetWelcomeFileInput?.();
 
   // ✅ Si estamos en index, mostramos bienvenida

@@ -1,6 +1,9 @@
 /* =========================
    HEADER
    ========================= */
+let chartVendidos   = null;
+let chartComprados  = null;
+let chartStock      = null;
 
 setDynamicTitle("Home");
 
@@ -27,11 +30,11 @@ function renderResumen() {
   if (sessionStorage.getItem("activeFile") !== "true") return;
 
   const ventas = getData("ventas") || [];
-  const gastos = getData("gastos") || [];
+  const compras = getData("compras") || [];
 
   const totalVentas = ventas.reduce((a, b) => a + (b.t || 0), 0);
-  const totalGastos = gastos.reduce((a, b) => a + (b.m || 0), 0);
-  const resultado   = totalVentas - totalGastos;
+  const totalCompras = compras.reduce((a, b) => a + (b.t || 0), 0);
+  const resultado   = totalVentas - totalCompras;
 
   const cont = document.getElementById("resumen");
   if (!cont) return;
@@ -43,7 +46,7 @@ function renderResumen() {
     </div>
 
     <div class="resumen-item">
-      <span>Gastos</span>
+      <span>Compras</span>
       <strong id="vGastos">$0</strong>
     </div>
 
@@ -57,9 +60,226 @@ function renderResumen() {
 
   requestAnimationFrame(() => {
     animateNumber(document.getElementById("vVentas"), totalVentas, 1200);
-    animateNumber(document.getElementById("vGastos"), totalGastos, 1200);
+    animateNumber(document.getElementById("vGastos"), totalCompras, 1200);
     animateNumber(document.getElementById("vResultado"), resultado, 1500);
   });
+
+  renderResumenProductos();
+  renderGraficosProductos();
+}
+
+function renderResumenProductos() {
+  if (sessionStorage.getItem("activeFile") !== "true") return;
+
+  const productos = getData("productos") || [];
+  const compras   = getData("compras")   || [];
+  const ventas    = getData("ventas")    || [];
+
+  const cont = document.getElementById("resumenProductos");
+  if (!cont) return;
+
+  cont.innerHTML = "";
+
+  productos.forEach(p => {
+
+    const comprados = p.comprados || 0;
+    const vendidos  = p.vendidos  || 0;
+    const stock     = comprados - vendidos;
+
+    // ===============================
+    // DETALLE COMPRAS DEL PRODUCTO
+    // ===============================
+    const comprasProd = [];
+
+    compras.forEach(c => {
+      (c.items || []).forEach(it => {
+        if (it.codigo === p.codigo) {
+          comprasProd.push({
+            fecha: c.f,
+            cantidad: it.cantidad,
+            precio: it.precio
+          });
+        }
+      });
+    });
+
+    comprasProd.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    // ===============================
+    // DETALLE VENTAS DEL PRODUCTO
+    // ===============================
+    const ventasProd = [];
+
+    ventas.forEach(v => {
+      (v.items || []).forEach(it => {
+        if (it.codigo === p.codigo) {
+          ventasProd.push({
+            fecha: v.f,
+            cantidad: it.cantidad,
+            precio: it.precio
+          });
+        }
+      });
+    });
+
+    ventasProd.sort((a, b) => new Date(b.fecha) - new Date(a.fecha));
+
+    // ===============================
+    // RENDER
+    // ===============================
+    cont.innerHTML += `
+      <div class="producto-resumen">
+
+        <!-- HEADER CORREGIDO -->
+        <div class="producto-header">
+
+          <div class="ph-item">
+            <span class="ph-label">Código</span>
+            <span class="ph-value">${p.codigo}</span>
+          </div>
+
+          <div class="ph-item">
+            <span class="ph-label">Producto</span>
+            <span class="ph-value">${p.nombre}</span>
+          </div>
+
+          <div class="ph-item">
+            <span class="ph-label">Comprados</span>
+            <span class="ph-value">${comprados}</span>
+          </div>
+
+          <div class="ph-item">
+            <span class="ph-label">Vendidos</span>
+            <span class="ph-value">${vendidos}</span>
+          </div>
+
+          <div class="ph-item ${stock < 0 ? "negativo" : ""}">
+            <span class="ph-label">Stock</span>
+            <span class="ph-value">${stock}</span>
+          </div>
+
+        </div>
+
+        <div class="producto-detalle">
+
+          <div class="detalle-col">
+            <h4>📦 Compras</h4>
+            <div class="detalle-scroll">
+              ${
+                comprasProd.length
+                  ? comprasProd.map(c => `
+                    <div class="detalle-item">
+                      <span>${c.fecha}</span>
+                      <span>${c.cantidad} × ${formatCLP(c.precio)}</span>
+                    </div>
+                  `).join("")
+                  : `<div class="detalle-vacio">Sin compras</div>`
+              }
+            </div>
+          </div>
+
+          <div class="detalle-col">
+            <h4>🧾 Ventas</h4>
+            <div class="detalle-scroll">
+              ${
+                ventasProd.length
+                  ? ventasProd.map(v => `
+                    <div class="detalle-item">
+                      <span>${v.fecha}</span>
+                      <span>${v.cantidad} × ${formatCLP(v.precio)}</span>
+                    </div>
+                  `).join("")
+                  : `<div class="detalle-vacio">Sin ventas</div>`
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    `;
+  });
+}
+
+function buildProductoChart(canvasId, label, values) {
+  const ctx = document.getElementById(canvasId);
+  if (!ctx) return null;
+
+  return new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: label,
+      datasets: [{
+        data: values,
+        backgroundColor: generarColores(label.length),
+        borderWidth: 1
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      cutout: "65%",
+
+      plugins: {
+        legend: {
+          position: "right",
+          labels: {
+            boxWidth: 14,
+            padding: 12
+          }
+        }
+      }
+    }
+  });
+}
+
+function generarColores(n) {
+  const base = [
+    "#4fc3f7", "#81c784", "#ffb74d",
+    "#e57373", "#9575cd", "#4db6ac",
+    "#f06292", "#aed581", "#7986cb"
+  ];
+
+  return Array.from({ length: n }, (_, i) =>
+    base[i % base.length]
+  );
+}
+
+function renderGraficosProductos() {
+  if (sessionStorage.getItem("activeFile") !== "true") return;
+
+  const productos = getData("productos") || [];
+  if (!productos.length) return;
+
+  const labels = productos.map(p => p.nombre);
+
+  const vendidos   = productos.map(p => p.vendidos  || 0);
+  const comprados  = productos.map(p => p.comprados || 0);
+  const stock      = productos.map(p =>
+    (p.comprados || 0) - (p.vendidos || 0)
+  );
+
+  // destruir si ya existen
+  chartVendidos?.destroy();
+  chartComprados?.destroy();
+  chartStock?.destroy();
+
+  chartVendidos = buildProductoChart(
+    "graficoVendidos",
+    labels,
+    vendidos
+  );
+
+  chartComprados = buildProductoChart(
+    "graficoComprados",
+    labels,
+    comprados
+  );
+
+  chartStock = buildProductoChart(
+    "graficoStock",
+    labels,
+    stock
+  );
 }
 
 /* =========================
@@ -125,11 +345,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
       saveData("usuario", user);
       saveData("ventas", []);
-      saveData("gastos", []);
+      saveData("compras", []);
       saveData("productos", []);
 
       // 🔑 archivo activo + sesión válida
       sessionStorage.setItem("activeFile", "true");
+      updateQuickLogout();
 
       document.getElementById("modalNuevoUsuario")
         ?.classList.add("hidden");
@@ -160,5 +381,9 @@ document.addEventListener("DOMContentLoaded", () => {
   if (sessionStorage.getItem("activeFile") === "true") {
     renderBusinessHeader();
     renderResumen();
+    renderResumenProductos();
   }
+
+  // ⬅️ UNA sola llamada, siempre al final
+  updateQuickLogout();
 });

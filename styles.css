@@ -166,17 +166,39 @@ form button { width: 100%; margin-top: 10px; }
 }
 
 .btn-volver {
-  padding: 10px 20px;
-  border-radius: 10px;
-  background: #5f6c7b;
-  color: #fff;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+
+  background: #2f80ed;
+  color: white;
   text-decoration: none;
-  font-size: 14px;
+
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 500;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.12);
-  transition: background 0.2s ease, transform 0.1s ease;
+
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+  z-index: 1000;
 }
-.btn-volver:hover { background: #4a5562; transform: translateY(-1px); }
+
+.btn-volver:hover {
+  background: #1c6fd5;
+}
+
+.quick-logout {
+  background: #2f80ed;
+  position: fixed;
+  top: 16px;
+  right: 16px;
+
+  z-index: 1000;
+}
+
+.quick-logout:hover {
+  background: #1c6fd5;
+}
 
 .btn-editar, .btn-eliminar {
   border: none;
@@ -316,10 +338,6 @@ form button { width: 100%; margin-top: 10px; }
   box-shadow: 0 4px 12px rgba(0,0,0,0.3);
 }
 
-.quick-logout:hover {
-  background: #2f80ed;
-}
-
 /* =========================
    RANGO DE FECHAS
    ========================= */
@@ -367,4 +385,224 @@ form button { width: 100%; margin-top: 10px; }
   .date-range button {
     width: 100%;
   }
+}
+
+.table-scroll {
+  max-height: 420px;       /* ajusta a gusto */
+  overflow-y: auto;
+  margin-top: 16px;
+  border-radius: 12px;
+}
+
+/* Opcional: header fijo visualmente más limpio */
+.table-scroll table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.resumen-productos {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.producto-resumen {
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 10px;
+  padding: 12px;
+}
+
+.producto-header {
+  display: grid;
+  grid-template-columns: 90px 1.5fr 120px 120px 100px;
+  gap: 24px;                 /* ← más aire */
+  align-items: flex-start;
+  padding: 14px 18px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.producto-header strong {
+  display: block;
+  font-size: 1rem;
+}
+
+.producto-detalle {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.detalle-col h4 {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.15);
+  font-size: 0.85rem;
+  opacity: 0.9;
+}
+
+.detalle-col {
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  padding: 8px;
+  background: rgba(255,255,255,0.02);
+}
+
+.detalle-scroll {
+  max-height: 110px;
+  overflow-y: auto;
+  padding: 6px 8px;
+  background: rgba(0,0,0,0.08);
+  border-radius: 6px;
+}
+
+.detalle-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 3px 0;
+  font-size: 0.8rem;
+}
+
+.detalle-vacio {
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+.negativo {
+  color: #ff6b6b;
+}
+
+.container {
+  max-width: 720px;
+}
+
+.ph-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ph-label {
+  font-size: 0.7rem;
+  font-weight: 700;          /* 🔥 negrita en el título */
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  opacity: 0.7;
+}
+
+.ph-value {
+  font-size: 0.95rem;
+  font-weight: 400;          /* valor normal */
+}
+
+.ph-item.stock-negativo .ph-value {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+
+/* ===============================
+   HEADER DEL PRODUCTO
+   =============================== */
+
+.producto-header {
+  display: grid;
+  grid-template-columns: 90px 1fr 120px 120px 100px;
+  gap: 16px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.ph-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* 🔥 TÍTULOS */
+.ph-label {
+  font-size: 0.7rem;
+  font-weight: 900;          /* ← negrita */
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.75;
+}
+
+/* VALORES */
+.ph-value {
+  font-size: 0.95rem;
+  font-weight: 400;
+  line-height: 1.2;
+}
+
+/* STOCK NEGATIVO */
+.ph-item.negativo .ph-value {
+  color: #c0392b;
+  font-weight: 600;
+}
+
+/* ===============================
+   CARD ANCHA PARA RESUMEN
+   =============================== */
+
+#screen-app .card {
+  max-width: 860px;   /* ← más aire horizontal */
+}
+
+/* =========================
+   CONTENEDOR DE GRÁFICOS
+   ========================= */
+
+.graficos-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;            /* ⬅️ separacion entre gráficos (prueba 40–70px) */
+  margin-top: 0px;
+}
+
+
+/* =========================
+   CARD DEL GRÁFICO
+   ========================= */
+
+.grafico-card {
+  background: #fff;
+  border-radius: 18px;
+  padding: 8px 2px 2px; /* ↓ menos aire arriba */
+}
+
+.grafico-separador {
+  height: 1px;
+  background: #181616;
+  margin: 12px 0;   /* compacto, no exagerado */
+  width: 100%;
+}
+
+/* =========================
+   TÍTULO DEL GRÁFICO
+   ========================= */
+
+.grafico-card h3 {
+  margin-bottom: 0px;
+  margin: 0 0 0px;        /* ↓ título más cerca del gráfico */
+  text-align: left;
+  font-size: 15px;
+}
+
+
+/* =========================
+   CANVAS (TAMAÑO REAL)
+   ========================= */
+
+.grafico-card canvas {
+  width: 560px !important;   /* ⬅️ TAMAÑO HORIZONTAL (prueba 500–650px) */
+  height: 560px !important;  /* ⬅️ TAMAÑO VERTICAL   (igual que width) */
+
+  max-width: 100%;           /* responsive */
+  max-height: none;
+
+  margin: 0 auto;
+  display: block;
 }

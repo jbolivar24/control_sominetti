@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Compras</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<a href="index.html" class="btn-volver">← Volver al resumen</a>
+<button id="btnQuickLogout" class="quick-logout">
+  Guardar y cerrar sesión 💾🔒
+</button>
+
+<h1>COMPRAS</h1>
+
+<form id="compraForm">
+
+  <input type="date" id="fecha" required>
+  <input type="text" id="factura" placeholder="Factura / Documento" required>
+  <input type="text" id="proveedor" placeholder="Proveedor" required>
+
+  <h3>Detalle de la compra</h3>
+
+  <div class="item-row">
+    <select id="producto">
+      <option value="">Seleccione producto</option>
+    </select>
+
+    <input type="number" id="cantidad" placeholder="Cantidad" min="1">
+    <input type="number" id="precio" placeholder="Precio compra">
+    <button type="button" id="btnAgregarItem" class="btn-mini">➕</button>
+  </div>
+
+  <table id="tablaItems"></table>
+
+  <div class="totales">
+    <div>Neto: <strong id="neto">$0</strong></div>
+    <div>IVA 19%: <strong id="iva">$0</strong></div>
+    <div>Total: <strong id="total">$0</strong></div>
+  </div>
+
+  <button>Guardar Compra</button>
+</form>
+
+<div class="date-range">
+  <label>Desde <input type="date" id="desde"></label>
+  <label>Hasta <input type="date" id="hasta"></label>
+  <button type="button" id="btnFiltrar">Consultar</button>
+</div>
+
+<div class="table-scroll">
+  <table id="tablaCompras"></table>
+</div>
+
+<div class="export-actions">
+  <button type="button" class="btn-secondary" onclick="exportComprasCSV()">
+    ⬇️ Exportar CSV
+  </button>
+  <button type="button" class="btn-secondary" onclick="exportComprasPDF()">
+    🖨️ Exportar PDF
+  </button>
+</div>
+
+<script src="data.js"></script>
+<script src="backup.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+<script src="compras.js"></script>
+<script src="navigation.js"></script>
+<script src="session.js"></script>
+<script src="quickLogout.js"></script>
+<script src="logoutModal.js"></script>
+
+<!-- MODAL DETALLE COMPRA -->
+<div id="modalDetalle" class="modal hidden">
+  <div class="modal-content">
+    <h3>Detalle de la compra</h3>
+
+    <div id="modalBody"></div>
+
+    <div class="modal-actions">
+      <button onclick="cerrarModal()">Cerrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- =========================
+     MODAL CERRAR SESIÓN
+     ========================= -->
+<div id="modalLogout" class="modal hidden">
+  <div class="modal-card">
+    <h2>🔒 Cerrar sesión</h2>
+    <p>
+      Se creará automáticamente un archivo de respaldo<br>
+      y se finalizará la sesión actual.
+    </p>
+
+    <div class="modal-actions">
+      <button id="btnConfirmLogout">Guardar y cerrar</button>
+      <button id="btnCancelLogout">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
