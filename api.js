@@ -2,7 +2,7 @@
    API CONFIG
    ================================================== */
 
-const API_ENDPOINT = "http://localhost:8080/api/backup2";
+const API_ENDPOINT = "https://api.xaimua.com/api/backup2";
 
 /* ==================================================
    BUILD JSON PAYLOAD
