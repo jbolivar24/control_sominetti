@@ -1,17 +1,19 @@
 document.addEventListener("DOMContentLoaded", () => {
 
   const modal = document.getElementById("modalLogout");
-  if (!modal) return;
 
   // Cancelar
-  document.getElementById("btnCancelLogout")
-    ?.addEventListener("click", () => {
+  const btnCancel = document.getElementById("btnCancelLogout");
+  if (btnCancel && modal) {
+    btnCancel.addEventListener("click", () => {
       modal.classList.add("hidden");
     });
+  }
 
   // Confirmar cerrar sesión
-  document.getElementById("btnConfirmLogout")
-    ?.addEventListener("click", async (event) => {
+  const btnConfirm = document.getElementById("btnConfirmLogout");
+  if (btnConfirm && modal) {
+    btnConfirm.addEventListener("click", async (event) => {
 
       const btn = event.currentTarget;
       btn.disabled = true;
@@ -29,4 +31,5 @@ document.addEventListener("DOMContentLoaded", () => {
 
       forceEndSession();               // SIEMPRE cerrar
     });
+  }
 });
