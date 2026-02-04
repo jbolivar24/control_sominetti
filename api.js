@@ -2,7 +2,7 @@
    API CONFIG
    ================================================== */
 
-const API_ENDPOINT = "https://api.xaimua.com/api/backup";
+const API_ENDPOINT = "https://api.xaimua.com/api/backup2";
 
 /* ==================================================
    BUILD JSON PAYLOAD
@@ -45,7 +45,7 @@ async function sendBackupToServer() {
 
   } catch (err) {
     console.error("❌ Error enviando JSON:", err);
-    alert("No se pudo enviar el respaldo al servidor");
+    //alert("No se pudo enviar el respaldo al servidor");
     return false;
   }
 }
