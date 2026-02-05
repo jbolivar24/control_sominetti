@@ -57,7 +57,7 @@ function forceEndSession() {
     // ✅ Si estamos en otra página, redirigimos al inicio
     window.location.href = "index.html";
   }
-  btn.disabled = false;
+  btnConfirm.disabled = false;
 }
 
 /* =========================

@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     btnConfirm.addEventListener("click", async (event) => {
 
       const btn = event.currentTarget;
-      btn.disabled = true;
+      //btn.disabled = true;
 
       modal.classList.add("hidden");
 
