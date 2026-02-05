@@ -1,5 +1,9 @@
 * { box-sizing: border-box; }
 
+html, body {
+  min-width: 1200px;
+}
+
 body {
   font-family: "Segoe UI", Arial, sans-serif;
   background: #f2f4f7;
@@ -562,7 +566,13 @@ form button { width: 100%; margin-top: 10px; }
    =============================== */
 
 #screen-app .card {
-  max-width: 860px;   /* ← más aire horizontal */
+  width: 1200px;
+  min-width: 1200px;
+  max-width: 1200px;
+}
+
+#screen-app {
+  min-width: 1200px;
 }
 
 /* =========================
