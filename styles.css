@@ -673,3 +673,16 @@ form button { width: 100%; margin-top: 10px; }
   background: #e2e8f0;
 }
 
+@media (max-width: 900px) {
+
+  body {
+    overflow-x: auto;
+  }
+
+  #screen-app {
+    transform: scale(0.33);
+    transform-origin: top left;
+    width: 1200px;
+  }
+
+}
